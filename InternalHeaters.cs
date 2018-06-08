@@ -22,7 +22,7 @@ namespace InternalHeaters
                 Logger.Error(ex);
                 ModSettings = new Settings();
             }
-            var harmony = HarmonyInstance.Create("com.joelmeador.ShopSeller");
+            var harmony = HarmonyInstance.Create($"com.joelmeador.{Settings.ModName}");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
     }

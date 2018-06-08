@@ -6,7 +6,7 @@ namespace InternalHeaters
 {
     public class Logger
     {
-        private static string LogFilePath => $"{ModDirectory}/ShopSeller.log";
+        private static string LogFilePath => $"{ModDirectory}/{Settings.ModName}.log";
 
         public static void Error(Exception ex)
         {
