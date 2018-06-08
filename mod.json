@@ -1,0 +1,18 @@
+﻿{
+  "Name": "InternalHeaters",
+  "Enabled": true,
+
+  "Version": "0.0.1",
+
+  "Author": "janxious",
+  "Website": "https://github.com/janxious/InternalHeaters",
+
+  "DLL": "InternalHeaters.dll",
+  "DLLEntryPoint": "InternalHeaters.AssemblyPatch.Init",
+  "DependsOn": [],
+  "ConflictsWith": [],
+
+  "Settings": {
+    "debug": true
+  }
+}
