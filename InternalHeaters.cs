@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using BattleTech;
 using Harmony;
@@ -32,13 +33,19 @@ namespace InternalHeaters
     {
         public static void Postfix(Mech __instance, ref float __result)
         {
+            var mech = __instance;
             Logger.Debug($"Patching in\npreheated: {__result}");
             Logger.Debug($"hsc? {__instance.StatCollection.GetValue<int>("HeatSinkCapacity")}");
-            // (float)base.Combat.Constants.Heat.InternalHeatSinkCount * base.Combat.Constants.Heat.DefaultHeatSinkDissipationCapacity;
+            var extraEngineDissipation = 0f;
+            if (mech.allComponents.Any(component => component.Description.Id == "Gear_HeatSink_Generic_Double"))
+            {
+                extraEngineDissipation = __instance.Combat.Constants.Heat.DefaultHeatSinkDissipationCapacity *
+                                         __instance.Combat.Constants.Heat.InternalHeatSinkCount;
+            }
             var additionalHeatSinks = __instance.MechDef.Chassis.Heatsinks;
             var heatSinkDissipation = __instance.Combat.Constants.Heat.DefaultHeatSinkDissipationCapacity;
-            var additionalHeatSinkDissipation = (float) additionalHeatSinks * heatSinkDissipation;
-            Logger.Debug($"additionalHeatSinks: {additionalHeatSinks}\nheatsinkDissipation: {heatSinkDissipation}\naddtionalHeatSinkDissipation: {additionalHeatSinkDissipation}");
+            var additionalHeatSinkDissipation = ((float) additionalHeatSinks * heatSinkDissipation) + extraEngineDissipation;
+            Logger.Debug($"additionalHeatSinks: {additionalHeatSinks}\nheatsinkDissipation: {heatSinkDissipation}\naddtionalHeatSinkDissipation: {additionalHeatSinkDissipation}\nextraEngineDissipation: {extraEngineDissipation}");
             __result = __result + additionalHeatSinkDissipation;
             Logger.Debug($"reheated: {__result}");
         }
