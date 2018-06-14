@@ -30,6 +30,19 @@ namespace InternalHeaters
         }
     }
 
+    public static class Calculators
+    {
+        public static float DoubleHeatsinkEngineDissipation(MechDef mechDef, HeatConstantsDef heatConstants)
+        {
+            if (Array.FindAll(mechDef.Inventory, componentRef => componentRef.ComponentDefType == ComponentType.HeatSink)
+                .All(componentRef => componentRef.ComponentDefID == "Gear_HeatSink_Generic_Double"))
+            {
+                return heatConstants.DefaultHeatSinkDissipationCapacity * heatConstants.InternalHeatSinkCount;
+            }
+            return 0f;
+        }
+    }
+
     [HarmonyPatch(typeof(Mech), "GetHeatSinkDissipation")]
     public static class Mech_GetHeatSinkDissipation_Patch
     {
@@ -37,24 +50,20 @@ namespace InternalHeaters
         {
             var mech = __instance;
             Logger.Debug($"Patching in\npreheated: {__result}");
-            Logger.Debug($"hsc? {__instance.StatCollection.GetValue<int>("HeatSinkCapacity")}");
+            Logger.Debug($"hsc? {mech.StatCollection.GetValue<int>("HeatSinkCapacity")}");
             var extraEngineDissipation = 0f;
-            if (AssemblyPatch.ModSettings.AllDoubleHeatSinksDoubleEngineHeatDissipation &&
-                mech.allComponents
-                    .FindAll(component => component.componentType == ComponentType.HeatSink)
-                    .All(component => component.Description.Id == "Gear_HeatSink_Generic_Double"))
+            if (AssemblyPatch.ModSettings.AllDoubleHeatSinksDoubleEngineHeatDissipation)
             {
-                extraEngineDissipation = __instance.Combat.Constants.Heat.DefaultHeatSinkDissipationCapacity *
-                                         __instance.Combat.Constants.Heat.InternalHeatSinkCount;
+                extraEngineDissipation =
+                    Calculators.DoubleHeatsinkEngineDissipation(mech.ToMechDef(), mech.Combat.Constants.Heat);
             }
 
             var additionalHeatSinks = 0;
             var heatSinkDissipation = 0f;
-
             if (AssemblyPatch.ModSettings.UseChassisHeatSinks)
             {
-                additionalHeatSinks = __instance.MechDef.Chassis.Heatsinks;
-                heatSinkDissipation = __instance.Combat.Constants.Heat.DefaultHeatSinkDissipationCapacity;
+                additionalHeatSinks = mech.MechDef.Chassis.Heatsinks;
+                heatSinkDissipation = mech.Combat.Constants.Heat.DefaultHeatSinkDissipationCapacity;
             }
 
             var additionalHeatSinkDissipation = (additionalHeatSinks * heatSinkDissipation) + extraEngineDissipation;
