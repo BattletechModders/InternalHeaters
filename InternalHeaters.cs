@@ -34,8 +34,10 @@ namespace InternalHeaters
     {
         public static float DoubleHeatsinkEngineDissipation(MechDef mechDef, HeatConstantsDef heatConstants)
         {
-            if (Array.FindAll(mechDef.Inventory, componentRef => componentRef.ComponentDefType == ComponentType.HeatSink)
-                .All(componentRef => componentRef.ComponentDefID == "Gear_HeatSink_Generic_Double"))
+            if (AssemblyPatch.ModSettings.AllDoubleHeatSinksDoubleEngineHeatDissipation &&
+                Array
+                    .FindAll(mechDef.Inventory, componentRef => componentRef.ComponentDefType == ComponentType.HeatSink)
+                    .All(componentRef => componentRef.ComponentDefID == "Gear_HeatSink_Generic_Double"))
             {
                 return heatConstants.DefaultHeatSinkDissipationCapacity * heatConstants.InternalHeatSinkCount;
             }
@@ -51,13 +53,7 @@ namespace InternalHeaters
             var mech = __instance;
             Logger.Debug($"Patching in\npreheated: {__result}");
             Logger.Debug($"hsc? {mech.StatCollection.GetValue<int>("HeatSinkCapacity")}");
-            var extraEngineDissipation = 0f;
-            if (AssemblyPatch.ModSettings.AllDoubleHeatSinksDoubleEngineHeatDissipation)
-            {
-                extraEngineDissipation =
-                    Calculators.DoubleHeatsinkEngineDissipation(mech.ToMechDef(), mech.Combat.Constants.Heat);
-            }
-
+            var extraEngineDissipation = Calculators.DoubleHeatsinkEngineDissipation(mech.ToMechDef(), mech.Combat.Constants.Heat);
             var additionalHeatSinks = 0;
             var heatSinkDissipation = 0f;
             if (AssemblyPatch.ModSettings.UseChassisHeatSinks)
