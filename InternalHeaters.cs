@@ -32,12 +32,14 @@ namespace InternalHeaters
 
     public static class Calculators
     {
+        private const string DoubleHeatSinkComponentId = "Gear_HeatSink_Generic_Double";
         public static float DoubleHeatsinkEngineDissipation(MechDef mechDef, HeatConstantsDef heatConstants)
         {
+            var heatsinks = Array.FindAll(mechDef.Inventory,
+                componentRef => componentRef.ComponentDefType == ComponentType.HeatSink);
             if (AssemblyPatch.ModSettings.AllDoubleHeatSinksDoubleEngineHeatDissipation &&
-                Array
-                    .FindAll(mechDef.Inventory, componentRef => componentRef.ComponentDefType == ComponentType.HeatSink)
-                    .All(componentRef => componentRef.ComponentDefID == "Gear_HeatSink_Generic_Double"))
+                heatsinks.Any(componentRef => componentRef.ComponentDefID == DoubleHeatSinkComponentId) &&
+                heatsinks.All(componentRef => componentRef.ComponentDefID == DoubleHeatSinkComponentId))
             {
                 return heatConstants.DefaultHeatSinkDissipationCapacity * heatConstants.InternalHeatSinkCount;
             }
