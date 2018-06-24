@@ -5,6 +5,7 @@ using BattleTech;
 using Harmony;
 using Newtonsoft.Json;
 using UnityEngine;
+using static InternalHeaters.AssemblyPatch;
 
 namespace InternalHeaters
 {
@@ -33,16 +34,23 @@ namespace InternalHeaters
 
     public static class Calculators
     {
-        private const string DoubleHeatSinkComponentId = "Gear_HeatSink_Generic_Double";
         public static float DoubleHeatsinkEngineDissipation(MechDef mechDef, HeatConstantsDef heatConstants)
         {
             var heatsinks = Array.FindAll(mechDef.Inventory,
                 componentRef => componentRef.ComponentDefType == ComponentType.HeatSink);
-            if (AssemblyPatch.ModSettings.AllDoubleHeatSinksDoubleEngineHeatDissipation &&
-                heatsinks.Any(componentRef => componentRef.ComponentDefID == DoubleHeatSinkComponentId) &&
-                heatsinks.All(componentRef => componentRef.ComponentDefID == DoubleHeatSinkComponentId))
+            if (ModSettings.AllDoubleHeatSinksDoubleEngineHeatDissipation &&
+                heatsinks.Any(componentRef => componentRef.ComponentDefID == ModSettings.DoubleHeatSinksDoubleEngineHeatDissipationComponentId) &&
+                heatsinks.All(componentRef => componentRef.ComponentDefID == ModSettings.DoubleHeatSinksDoubleEngineHeatDissipationComponentId))
             {
-                return heatConstants.DefaultHeatSinkDissipationCapacity * heatConstants.InternalHeatSinkCount;
+                var componentHeatRemoval = 0f;
+                if (ModSettings.DoNotCountFirstDoubleHeatSinksComponentDissipation)
+                {
+                    var component = (HeatSinkDef)heatsinks.First(componentRef =>
+                        componentRef.ComponentDefID ==
+                        ModSettings.DoubleHeatSinksDoubleEngineHeatDissipationComponentId).Def;
+                    componentHeatRemoval = component.DissipationCapacity;
+                }
+                return (heatConstants.DefaultHeatSinkDissipationCapacity * heatConstants.InternalHeatSinkCount) - componentHeatRemoval;
             }
             return 0f;
         }
@@ -59,7 +67,7 @@ namespace InternalHeaters
             var extraEngineDissipation = Calculators.DoubleHeatsinkEngineDissipation(mech.ToMechDef(), mech.Combat.Constants.Heat);
             var additionalHeatSinks = 0;
             var heatSinkDissipation = 0f;
-            if (AssemblyPatch.ModSettings.UseChassisHeatSinks)
+            if (ModSettings.UseChassisHeatSinks)
             {
                 additionalHeatSinks = mech.MechDef.Chassis.Heatsinks;
                 heatSinkDissipation = mech.Combat.Constants.Heat.DefaultHeatSinkDissipationCapacity;

@@ -17,6 +17,10 @@
 
     "useChassisHeatSinks": false,
 
-    "allDoubleHeatSinksDoubleEngineHeatDissipation": true
+    "allDoubleHeatSinksDoubleEngineHeatDissipation": true,
+
+    "doubleHeatSinksDoubleEngineHeatDissipationComponentId": "Gear_HeatSink_Generic_Double",
+
+    "doNotCountFirstDoubleHeatSinksComponentDissipation": false
   }
 }
