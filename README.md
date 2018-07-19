@@ -29,7 +29,7 @@ Setting | Type | Default | Description
 
 * [Battletech Game](http://battletechgame.com/)
 * [BTML](https://github.com/Mpstark/BattleTechModLoader)
-* [ModTek](https://github.com/Mpstark/ModTek))
+* [ModTek](https://github.com/Mpstark/ModTek)
 
 ## Special Thanks
 
