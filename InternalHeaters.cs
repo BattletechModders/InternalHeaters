@@ -39,15 +39,15 @@ namespace InternalHeaters
             var heatsinks = Array.FindAll(mechDef.Inventory,
                 componentRef => componentRef.ComponentDefType == ComponentType.HeatSink);
             if (ModSettings.AllDoubleHeatSinksDoubleEngineHeatDissipation &&
-                heatsinks.Any(componentRef => componentRef.ComponentDefID == ModSettings.DoubleHeatSinksDoubleEngineHeatDissipationComponentId) &&
-                heatsinks.All(componentRef => componentRef.ComponentDefID == ModSettings.DoubleHeatSinksDoubleEngineHeatDissipationComponentId))
+                heatsinks.Any(componentRef => ModSettings.DoubleHeatSinksDoubleEngineHeatDissipationComponentIds.Contains(componentRef.ComponentDefID)) &&
+                heatsinks.All(componentRef => ModSettings.DoubleHeatSinksDoubleEngineHeatDissipationComponentIds.Contains(componentRef.ComponentDefID)))
             {
                 var componentHeatRemoval = 0f;
                 if (ModSettings.DoNotCountFirstDoubleHeatSinksComponentDissipation)
                 {
                     var component = (HeatSinkDef)heatsinks.First(componentRef =>
-                        componentRef.ComponentDefID ==
-                        ModSettings.DoubleHeatSinksDoubleEngineHeatDissipationComponentId).Def;
+                        ModSettings.DoubleHeatSinksDoubleEngineHeatDissipationComponentIds.Contains(componentRef.ComponentDefID)
+                    ).Def;
                     componentHeatRemoval = component.DissipationCapacity;
                 }
                 return (heatConstants.DefaultHeatSinkDissipationCapacity * heatConstants.InternalHeatSinkCount) - componentHeatRemoval;
