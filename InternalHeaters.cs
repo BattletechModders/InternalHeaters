@@ -93,7 +93,7 @@ namespace InternalHeaters
             {
                 if (Combat == null)
                 {
-                    Combat = CombatGameConstants.CreateFromSaved(UnityGameInstance.BattleTechGame);
+                    Combat = CombatGameConstants.GetInstance(UnityGameInstance.BattleTechGame);
                 }
                 var baseHeatSinkDissipation = Combat.Heat.InternalHeatSinkCount * Combat.Heat.DefaultHeatSinkDissipationCapacity;
                 var totalHeatSinkDissipation = baseHeatSinkDissipation + Calculators.DoubleHeatsinkEngineDissipation(mechDef, Combat.Heat);
